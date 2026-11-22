@@ -1,13 +1,8 @@
 .vscode/
 steps.md
 
-__pycache__/
-*.pyc
-.venv/
-venv/
-results/*
-!results/.gitkeep
-.pytest_cache/
+
+!results/.gitkeep/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

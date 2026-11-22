@@ -1,0 +1,41 @@
+# Simulated airport inspired by Amsterdam Schiphol (AMS).
+# Times are in minutes. Aircraft sizes: regional < narrow < wide.
+
+aircraft_sizes:
+  regional: 0
+  narrow: 1
+  wide: 2
+
+# Minimum time between two flights at the same gate (cleaning, towing).
+buffer_minutes: 10
+
+gate_groups:
+  - name: B
+    max_size: narrow
+    walk_minutes: 10
+    count: 4
+  - name: C
+    max_size: narrow
+    walk_minutes: 6
+    count: 4
+  - name: D
+    max_size: wide
+    walk_minutes: 3
+    count: 6
+  - name: E
+    max_size: wide
+    walk_minutes: 6
+    count: 4
+  - name: F
+    max_size: wide
+    walk_minutes: 7
+    count: 3
+  - name: G
+    max_size: wide
+    walk_minutes: 10
+    count: 2
+
+# Remote stands: one action, accepts any aircraft, never full.
+remote:
+  max_size: wide
+  walk_minutes: 15

@@ -91,7 +91,7 @@ The environment is a **simplified airport inspired by [Amsterdam Schiphol Airpor
 | E    | Wide-body | Long-haul flights | Medium | 4 |
 | F    | Wide-body | Long-haul international flights | Medium | 3 |
 | G    | Wide-body | Long-haul flights, limited availability | Long | 2 |
-| Remote | Any | Used when no gate is suitable, bus transfer needed | Longest | 3 |
+| Remote stands | Any | Used when no gate is suitable, bus transfer needed | Longest | 1 |
 
 
 </div>
@@ -272,6 +272,53 @@ We also plot the **learning curves** (reward over training) and a **Gantt chart*
 <br>
 
 
+## $\color{#1F6FEB}{\textsf{Project Structure}}$
+
+```bash
+gatemind/
+│
+├── configs/
+│   ├── airport.yaml           # Gates: group, max size, distance, count + remote stands
+│   └── default.yaml           # Reward values, DQN hyperparameters, seeds, episodes
+│
+│   # Main package
+├── gatemind/
+│   ├── data/
+│   │   └── schedule_generator.py  # Generates one simulated day of flights
+│   ├── env/
+│   │   ├── airport.py             # Loads gates from airport.yaml, tracks when each gate is free
+│   │   └── gate_env.py            # Custom Gymnasium env: state, action mask, reward, transitions
+│   ├── agents/
+│   │   ├── random_agent.py        # Random valid gate
+│   │   ├── greedy_agent.py        # Closest valid gate
+│   │   ├── networks.py            # Q-network and dueling Q-network (PyTorch)
+│   │   ├── replay_buffer.py       # Stores and samples transitions
+│   │   └── dqn_agent.py           # DQN, with options for Double and Dueling
+│   ├── planning/
+│   │   └── optimal.py             # Offline best schedule (solver), optional
+│   └── utils/
+│       ├── metrics.py             # Contact gate rate, walking distance, size mismatch...
+│       └── plotting.py            # Learning curves, Gantt charts
+│
+├── scripts/
+│   ├── train.py               # Trains the DQN agents over 5 seeds
+│   ├── evaluate.py            # Runs all agents on the test days, builds the metrics table
+│   └── plot_results.py        # Generates the figures
+│
+├── results/                   # Saved models, logs, figures
+│
+├── tests/
+│   ├── test_generator.py      # Flights are valid (times, categories)
+│   ├── test_env.py            # Masking, rewards, gate occupancy, episode end
+│   └── test_agents.py         # Agents only pick valid actions
+│
+├── main.py                    # Entry point: python main.py train / evaluate / plot
+├── requirements.txt
+└── README.md
+```
+
+<br>
+
 ## $\color{#1F6FEB}{\textsf{Results}}$
 
 Results will be added after training.
@@ -281,7 +328,7 @@ Results will be added after training.
 
 ## $\color{#1F6FEB}{\textsf{Roadmap}}$
 
-- [] Airport configuration and flight schedule generator
+- [x] Airport configuration and flight schedule generator
 - [ ] Gymnasium environment with action masking, tested with the random agent
 - [ ] Greedy baseline
 - [ ] DQN agent
