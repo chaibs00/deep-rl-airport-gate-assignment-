@@ -59,13 +59,13 @@ def test_reward_values():
     env.reset(seed=0)
     flight = env.flights[0]
     remote = env.airport.remote_index
-    assert env._reward(flight, remote) == -10.0
+    assert env.reward(flight, remote) == -10.0
 
     # Best possible gate: D (closest) for a wide-body -> 10 - 3 * 3/10 - 0 = 9.1
     flight.size = env.airport.sizes["wide"]
     d1 = [g.name for g in env.airport.gates].index("D1")
-    assert env._reward(flight, d1) == pytest.approx(9.1)
+    assert env.reward(flight, d1) == pytest.approx(9.1)
 
     # Regional at a wide gate -> extra penalty of 2 size levels
     flight.size = env.airport.sizes["regional"]
-    assert env._reward(flight, d1) == pytest.approx(7.1)
+    assert env.reward(flight, d1) == pytest.approx(7.1)
