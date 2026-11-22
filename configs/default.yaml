@@ -9,3 +9,20 @@ reward:
 state:
   max_wait: 240           # "time until free" is capped at 4 hours
   max_turnaround: 240
+
+
+
+# DQN hyperparameters.
+dqn:
+  hidden: 128              # neurons per hidden layer
+  lr: 0.001                # learning rate (Adam)
+  gamma: 0.99              # discount factor
+  batch_size: 64
+  buffer_capacity: 50000   # transitions kept in memory (~500 days)
+  learning_starts: 1000    # transitions collected before learning (~10 days)
+  target_update: 500       # steps between target network updates
+  epsilon_start: 1.0       # fully random at the beginning
+  epsilon_end: 0.05        # 5% random at the end
+  epsilon_decay_steps: 20000   # steps to go from start to end (~200 days)
+
+
