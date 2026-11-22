@@ -1,6 +1,7 @@
 """
-Training script for the DQN agent.
-Trains a DQN agent for each seed and saves the models and training logs.
+Training script for the DQN agents.
+Trains each learning agent (dqn, double_dqn, dueling_dqn) for each seed
+and saves the models and training logs.
 
 """
 
@@ -34,7 +35,9 @@ def evaluate(env, agent, days):
 def train_one_seed(config, run_seed, name="dqn"):
     t_cfg = config["training"]
     env = GateAssignmentEnv()
-    agent = DQNAgent(env.observation_space.shape[0], env.action_space.n, config["dqn"], seed=run_seed)
+
+    agent_cfg = {**config["dqn"], **config["agents"][name]}  # base settings + variant options
+    agent = DQNAgent(env.observation_space.shape[0], env.action_space.n, agent_cfg, seed=run_seed)
 
     val_days = range(t_cfg["val_seed_start"], t_cfg["val_seed_start"] + t_cfg["val_days"])
     models_dir = os.path.join(t_cfg["results_dir"], "models")
@@ -91,7 +94,7 @@ def train_one_seed(config, run_seed, name="dqn"):
         writer.writerows(log)
 
 
-def main(episodes=None, seeds=None):
+def main(episodes=None, seeds=None, agent="all"):
     config = load_config()
     if episodes is not None:
         config["training"]["episodes"] = episodes
@@ -105,8 +108,10 @@ def main(episodes=None, seeds=None):
     greedy = np.mean([run_episode(env, GreedyAgent(env), d)["reward"] for d in val_days])
     print(f"Greedy val reward (reference): {greedy:.1f}\n")
 
-    for run_seed in config["training"]["seeds"]:
-        print(f"Training dqn, seed {run_seed}")
-        train_one_seed(config, run_seed)
+    names = list(config["agents"]) if agent == "all" else [agent]
+    for name in names:
+        for run_seed in config["training"]["seeds"]:
+            print(f"Training {name}, seed {run_seed}")
+            train_one_seed(config, run_seed, name)
 
     print(f"\nDone. Models in {t_cfg['results_dir']}/models, logs in {t_cfg['results_dir']}/logs")

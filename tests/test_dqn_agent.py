@@ -55,3 +55,11 @@ def test_learning_produces_finite_losses():
     losses = play_one_day(agent, env)
     assert len(losses) > 0
     assert all(np.isfinite(losses))
+
+
+def test_double_and_dueling_variants_learn():
+    for options in [{"double": True}, {"double": True, "dueling": True}]:
+        agent, env = make_agent_and_env(learning_starts=64, **options)
+        losses = play_one_day(agent, env)
+        assert len(losses) > 0
+        assert all(np.isfinite(losses))

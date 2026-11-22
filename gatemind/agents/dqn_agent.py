@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from gatemind.agents.networks import QNetwork, masked_q_values
+from gatemind.agents.networks import DuelingQNetwork, QNetwork, masked_q_values
 from gatemind.agents.replay_buffer import ReplayBuffer
 
 
@@ -18,8 +18,12 @@ class DQNAgent:
         self.rng = np.random.default_rng(seed)
         torch.manual_seed(seed)
 
+        # Options (step 8): Double DQN target and dueling architecture.
+        self.double = config.get("double", False)
+        network = DuelingQNetwork if config.get("dueling", False) else QNetwork
+
         # Online network (learns) and target network (slow copy, used for targets).
-        self.q_net = QNetwork(obs_dim, n_actions, config["hidden"])
+        self.q_net = network(obs_dim, n_actions, config["hidden"])
         self.target_net = copy.deepcopy(self.q_net)
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=config["lr"])
 
@@ -73,12 +77,20 @@ class DQNAgent:
         # Q(s, a) for the actions that were actually taken.
         q_taken = self.q_net(obs).gather(1, actions.unsqueeze(1)).squeeze(1)
 
-        # Target: r + gamma * max over valid a' of Q_target(s', a').
+        # Target: r + gamma * value of the best valid next gate.
         with torch.no_grad():
-            next_q = masked_q_values(self.target_net(next_obs), next_masks)
-            next_max = next_q.max(dim=1).values
-            next_max = torch.where(dones.bool(), torch.zeros_like(next_max), next_max)
-            target = rewards + c["gamma"] * next_max
+            if self.double:
+                # Double DQN: the online network chooses a', the target network evaluates it.
+                online_next = masked_q_values(self.q_net(next_obs), next_masks)
+                next_actions = online_next.argmax(dim=1, keepdim=True)
+                next_value = self.target_net(next_obs).gather(1, next_actions).squeeze(1)
+            else:
+                # DQN: the target network both chooses and evaluates a'.
+                next_q = masked_q_values(self.target_net(next_obs), next_masks)
+                next_value = next_q.max(dim=1).values
+
+            next_value = torch.where(dones.bool(), torch.zeros_like(next_value), next_value)
+            target = rewards + c["gamma"] * next_value
 
         loss = F.smooth_l1_loss(q_taken, target)
 

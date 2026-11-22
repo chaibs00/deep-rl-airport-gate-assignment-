@@ -22,11 +22,17 @@ def main():
     )
     parser.add_argument("--episodes", type=int, help="Override the number of training episodes")
     parser.add_argument("--seeds", type=int, help="Override the number of training seeds")
+    parser.add_argument(
+        "--agent",
+        default="all",
+        choices=["all", "dqn", "double_dqn", "dueling_dqn"],
+        help="Which learning agent to train",
+    )
     args = parser.parse_args()
 
     if args.command == "train":
         from scripts.train import main as train
-        train(episodes=args.episodes, seeds=args.seeds)
+        train(episodes=args.episodes, seeds=args.seeds, agent=args.agent)
     elif args.command == "evaluate":
         print("Evaluation is not implemented yet (step 9).")
     elif args.command == "plot":

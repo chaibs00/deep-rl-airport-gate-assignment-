@@ -24,6 +24,9 @@ dqn:
   epsilon_start: 1.0       # fully random at the beginning
   epsilon_end: 0.05        # 5% random at the end
   epsilon_decay_steps: 20000   # steps to go from start to end (~200 days)
+  # DQN variants.
+  double: false            # Double DQN target
+  dueling: false           # dueling network architecture
 
 
 
@@ -37,3 +40,9 @@ training:
   results_dir: results
 
 
+
+# The three learning agents: each one changes a single option.
+agents:
+  dqn: {double: false, dueling: false}
+  double_dqn: {double: true, dueling: false}
+  dueling_dqn: {double: true, dueling: true}
