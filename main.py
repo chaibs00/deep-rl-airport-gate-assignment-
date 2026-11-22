@@ -1,7 +1,8 @@
 """Entry point for GateMind.
 
 Usage:
-    python main.py train
+    python main.py train                         # full training (config values)
+    python main.py train --episodes 50 --seeds 1 # quick test run
     python main.py evaluate
     python main.py plot
 
@@ -19,10 +20,13 @@ def main():
         choices=["train", "evaluate", "plot"],
         help="Which part of the project to run",
     )
+    parser.add_argument("--episodes", type=int, help="Override the number of training episodes")
+    parser.add_argument("--seeds", type=int, help="Override the number of training seeds")
     args = parser.parse_args()
 
     if args.command == "train":
-        print("Training is not implemented yet (step 7).")
+        from scripts.train import main as train
+        train(episodes=args.episodes, seeds=args.seeds)
     elif args.command == "evaluate":
         print("Evaluation is not implemented yet (step 9).")
     elif args.command == "plot":

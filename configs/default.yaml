@@ -26,3 +26,14 @@ dqn:
   epsilon_decay_steps: 20000   # steps to go from start to end (~200 days)
 
 
+
+# Training.
+training:
+  episodes: 500            # simulated days per training run
+  seeds: [0, 1, 2, 3, 4]   # one training run per seed
+  eval_every: 25           # evaluate every N episodes
+  val_days: 10             # number of validation days
+  val_seed_start: 500      # validation days use seeds 500, 501, ...
+  results_dir: results
+
+
