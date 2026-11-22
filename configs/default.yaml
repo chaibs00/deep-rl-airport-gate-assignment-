@@ -54,3 +54,14 @@ evaluation:
   test_days: 20
   test_seed_start: 1000    # test days use seeds 1000, 1001, ...
   random_runs: 5           # the random agent is run with 5 different seeds
+
+
+
+# Figures.
+plots:
+  gantt_day: 1000          # test day shown in the Gantt chart
+  gantt_agent: dueling_dqn # learning agent compared with greedy
+  gantt_seed: 0            # which trained seed to use
+
+
+

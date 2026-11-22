@@ -2,8 +2,10 @@
 steps.md
 
 
-!results/.gitkeep/
-results/
+
+results/*
+!results/figures/
+!results/figures/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

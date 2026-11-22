@@ -37,7 +37,8 @@ def main():
         from scripts.evaluate import main as evaluate
         evaluate()
     elif args.command == "plot":
-        print("Plotting is not implemented yet (step 10).")
+        from scripts.plot_results import main as plot
+        plot()
 
 
 if __name__ == "__main__":
