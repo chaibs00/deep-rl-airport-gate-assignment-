@@ -71,7 +71,8 @@ class GateAssignmentEnv(gym.Env):
                 f"Invalid action {action} for flight {flight.flight_id}: use the action mask."
             )
 
-        reward = self._reward(flight, action)
+        
+        reward = self.reward(flight, action)
         self.airport.assign(action, flight.departure)
         self.assignments.append((flight, self.airport.gates[action].name))
 
@@ -90,7 +91,11 @@ class GateAssignmentEnv(gym.Env):
         flight = self.flights[self.index]
         return self.airport.valid_mask(flight.size, flight.arrival)
 
-    def _reward(self, flight, action):
+    def current_flight(self):
+        """The flight waiting for a gate."""
+        return self.flights[self.index]
+
+    def reward(self, flight, action):
         gate = self.airport.gates[action]
         r = self.reward_cfg
 
