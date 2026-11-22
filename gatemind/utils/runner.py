@@ -1,5 +1,7 @@
 """Runs one simulated day with any agent and returns a summary."""
 
+from gatemind.utils.metrics import day_metrics
+
 
 def run_episode(env, agent, seed):
     obs, info = env.reset(seed=seed)
@@ -10,5 +12,4 @@ def run_episode(env, agent, seed):
         obs, reward, done, _, info = env.step(action)
         total_reward += reward
 
-    remote = sum(1 for _, gate in env.assignments if gate == "REMOTE")
-    return {"reward": total_reward, "remote": remote}
+    return {"reward": total_reward, **day_metrics(env)}

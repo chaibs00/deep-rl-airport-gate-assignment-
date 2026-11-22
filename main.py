@@ -34,7 +34,8 @@ def main():
         from scripts.train import main as train
         train(episodes=args.episodes, seeds=args.seeds, agent=args.agent)
     elif args.command == "evaluate":
-        print("Evaluation is not implemented yet (step 9).")
+        from scripts.evaluate import main as evaluate
+        evaluate()
     elif args.command == "plot":
         print("Plotting is not implemented yet (step 10).")
 

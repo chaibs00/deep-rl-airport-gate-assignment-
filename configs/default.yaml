@@ -46,3 +46,11 @@ agents:
   dqn: {double: false, dueling: false}
   double_dqn: {double: true, dueling: false}
   dueling_dqn: {double: true, dueling: true}
+
+
+
+# Final evaluation on unseen test days.
+evaluation:
+  test_days: 20
+  test_seed_start: 1000    # test days use seeds 1000, 1001, ...
+  random_runs: 5           # the random agent is run with 5 different seeds
