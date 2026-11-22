@@ -1,0 +1,11 @@
+# Reward values (see README, Reward Function).
+reward:
+  contact: 10.0           # flight assigned to a contact gate
+  remote: -10.0           # flight sent to a remote stand
+  max_distance_penalty: 3.0   # penalty for the farthest contact gate
+  size_mismatch: 1.0      # penalty per size level of difference (aircraft vs gate)
+
+# Normalization constants for the state vector (minutes).
+state:
+  max_wait: 240           # "time until free" is capped at 4 hours
+  max_turnaround: 240
