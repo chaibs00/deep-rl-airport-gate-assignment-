@@ -1,0 +1,25 @@
+# Flight schedule generator: one simulated day.
+# Times are in minutes after midnight (360 = 06:00).
+
+flights_per_day: 100
+
+day_start: 360   # 06:00, first possible arrival
+day_end: 1320    # 22:00, last possible arrival
+
+# Arrival peaks (mean time, spread, share of flights).
+# The remaining share arrives uniformly over the day.
+peaks:
+  - {mean: 480, std: 60, share: 0.35}    # morning peak around 08:00
+  - {mean: 1080, std: 60, share: 0.35}   # evening peak around 18:00
+
+# Share of each aircraft category (must sum to 1).
+fleet_mix:
+  regional: 0.25
+  narrow: 0.50
+  wide: 0.25
+
+# Turnaround time on the ground, in minutes (mean, std, minimum).
+turnaround:
+  regional: {mean: 40, std: 10, min: 25}
+  narrow: {mean: 60, std: 15, min: 35}
+  wide: {mean: 150, std: 30, min: 90}
