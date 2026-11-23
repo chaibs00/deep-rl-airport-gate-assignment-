@@ -6,6 +6,8 @@ steps.md
 results/*
 !results/figures/
 !results/figures/*
+!results/tables/
+!results/tables/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

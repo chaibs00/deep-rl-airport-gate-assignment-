@@ -1,0 +1,6 @@
+agent,runs,contact_rate,contact_rate_std,remote,remote_std,walk,walk_std,size_mismatch,size_mismatch_std,reward,reward_std
+Random,5,89.04,0.63,10.96,0.63,7.3,0.05,49.99,0.58,547.55,11.05
+Greedy,1,99.0,0.0,1.0,0.0,5.71,0.0,45.4,0.0,758.15,0.0
+DQN,5,98.74,0.25,1.26,0.25,5.96,0.17,54.22,3.74,734.33,5.12
+Double DQN,5,98.91,0.14,1.09,0.14,6.12,0.37,51.99,3.37,734.11,5.36
+Dueling Double DQN,5,98.92,0.07,1.08,0.07,6.07,0.33,51.52,1.94,737.76,7.24

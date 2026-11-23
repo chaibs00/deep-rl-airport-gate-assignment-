@@ -323,6 +323,12 @@ gatemind/
 
 Results will be added after training.
 
+```bash
+python main.py train
+python main.py evaluate
+python main.py plot
+```
+
 <br>
 
 
