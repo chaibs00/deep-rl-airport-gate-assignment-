@@ -321,7 +321,7 @@ gatemind/
 
 ## $\color{#1F6FEB}{\textsf{Results}}$
 
-Results will be added after training.
+Each learning agent was trained for 500 episodes (simulated days) with 5 different random seeds. All agents were then tested on the same **20 unseen days**.
 
 ```bash
 python main.py train
@@ -329,18 +329,98 @@ python main.py evaluate
 python main.py plot
 ```
 
+- The table shows the average over the 20 test days, with the standard deviation across seeds in parentheses.
+
+<div align="center">
+
+| Agent | Contact gate rate | Remote stands per day | Walking time (min) | Size mismatch | Reward |
+|---|---:|---:|---:|---:|---:|
+| Random | 89.0% (0.6) | 10.96 (0.63) | 7.30 (0.05) | 50.0% (0.6) | 547.6 (11.1) |
+| **Greedy** | **99.0%** | **1.00** | **5.71** | **45.4%** | **758.2** |
+| DQN | 98.7% (0.3) | 1.26 (0.25) | 5.96 (0.17) | 54.2% (3.7) | 734.3 (5.1) |
+| Double DQN | 98.9% (0.1) | 1.09 (0.14) | 6.12 (0.37) | 52.0% (3.4) | 734.1 (5.4) |
+| Dueling Double DQN | 98.9% (0.1) | 1.08 (0.07) | 6.07 (0.33) | 51.5% (1.9) | 737.8 (7.2) |
+
+</div>
+
+**How to read the table:**
+
+- **Size mismatch** is the share of flights parked at a gate larger than needed (for example, a narrow-body at a wide-body gate).
+- **Greedy** is deterministic, so it has no standard deviation.
+- Higher is better for contact gate rate and reward. Lower is better for remote stands, walking time and size mismatch.
+
+### $\color{#E36209}{\textsf{1. The DQN Agents Do Not Beat Greedy}}$
+
+- All three DQN agents clearly outperform the random agent (about **+190 reward per day**) and keep almost every flight at a contact gate (**~99%**).
+- However, **none of them beats the greedy agent**, on any metric. They score about **20 to 24 points per day below greedy**.
+- The largest gap is in **size mismatch**: the DQN agents park **51 to 54%** of flights at gates larger than needed, against **45%** for greedy. This is the opposite of what we expected, since keeping large gates free for wide-body aircraft was the main way a planning agent could improve on greedy.
+- Between the three variants, the differences are small and within the standard deviation. Dueling Double DQN is slightly ahead, but not significantly.
+
+### $\color{#E36209}{\textsf{2. Training Made the Agents Worse}}$
+
+<div align="center">
+  <img src="./results/figures/1_learning_curves.png" alt="Validation reward during training" width="70%">
+</div>
+
+The learning curves show the validation reward during training (mean across seeds, with the standard deviation as a shaded band). The dashed line is the greedy agent.
+
+- At the first evaluation (episode 25), all agents already score around **727**, close to greedy (731).
+- During training, the reward then **decreases** to around **705–710** and stays there.
+
+This means the agents did not learn a better policy. They started from a reasonable one and drifted away from it. The reason is explained in the [Issues and Possible Fixes](#color1f6febtextsfissues-and-possible-fixes) section.
+
+### $\color{#E36209}{\textsf{3. Comparing the Schedules}}$
+
+<div align="center">
+  <img src="./results/figures/2_gantt_comparison.png" alt="Greedy and Dueling Double DQN schedules on the same day" width="100%">
+</div>
+
+The Gantt charts show the schedules of the greedy agent and the Dueling Double DQN agent (seed 0) on the same test day. Each bar is one flight, from arrival to departure, colored by aircraft category.
+
+- **Greedy** fills the closest gates first. In the morning, several D gates (wide-body gates close to the terminal) are used by narrow-body aircraft.
+- **Dueling Double DQN** uses the C gates more for narrow-body aircraft, which is a good choice. But it still parks narrow-body aircraft at wide-body gates (D, E, F, G), sometimes far from the terminal (F1, G2), which increases both walking time and size mismatch.
+- Neither agent sends a flight to a remote stand on this day.
+
+<br>
+
+## $\color{#1F6FEB}{\textsf{Issues and Possible Fixes}}$
+
+### $\color{#E36209}{\textsf{Why the DQN Agents Struggle}}$
+
+**1. The useful signal is hidden in the reward.** Every flight assigned to a contact gate receives about **+10**, while the difference between a good gate and a bad one is only **1 to 4 points**. Most of the reward says "the flight got a gate", which is true for almost every choice.
+
+**2. The Q-values are large compared to these differences.** With γ = 0.99 and 100 flights per day, the Q-values reach several hundred. A prediction error of only 1% is already larger than the difference between two gates, so the network cannot reliably tell which gate is better.
+
+**3. Greedy is already close to the best possible schedule.** With 100 flights per day, the airport is rarely full: greedy sends only one flight per day to a remote stand. This leaves little room for a planning agent to improve.
+
+The early validation score (727) confirms this. An almost untrained network rarely chooses the remote stand, and any contact gate already gives +5 to +9, so even a nearly random choice among contact gates scores well. Training then adds noise instead of useful information.
+
+### $\color{#E36209}{\textsf{Possible Fixes}}$
+
+<div align="center">
+
+| Fix | Change | Expected effect |
+| --- | --- | --- |
+| Shift the reward | Contact gate reward from +10 to 0 (penalties unchanged) | Removes the large constant part of the reward, so the differences between gates become the main signal. Since every day has the same number of flights, the best schedule does not change. |
+| Lower the discount factor | γ from 0.99 to 0.95 | The agent looks about 20 flights ahead instead of the whole day: enough to plan for the next peak, with smaller and less noisy Q-values. |
+| Increase congestion | 110 to 120 flights per day | Gates become scarce more often, so planning ahead matters more and greedy has more room to make mistakes. |
+
+</div>
+
+These changes will be tested in a next version of the project.
+
 <br>
 
 
 ## $\color{#1F6FEB}{\textsf{Roadmap}}$
 
 - [x] Airport configuration and flight schedule generator
-- [ ] Gymnasium environment with action masking, tested with the random agent
-- [ ] Greedy baseline
-- [ ] DQN agent
-- [ ] Double DQN and Dueling DQN
-- [ ] Offline optimal reference
-- [ ] Evaluation, learning curves and Gantt charts
+- [x] Gymnasium environment with action masking, tested with the random agent
+- [x] Greedy baseline
+- [x] DQN agent
+- [x] Double DQN and Dueling DQN
+- [x] Offline optimal reference
+- [x] Evaluation, learning curves and Gantt charts
 - [ ] Optional: random flight delays (stochastic environment)
 
 <br>
